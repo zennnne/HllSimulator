@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>HLL Educational Pro - Formula & Values</title>
+    <title>HLL Educational Pro - Manual Injection Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .particle { 
@@ -21,8 +21,6 @@
         .update-flash { animation: flash 0.8s ease-out; }
         @keyframes flash { 0% { background-color: #fbbf24; transform: scaleX(1.1); } 100% { background-color: #3b82f6; transform: scaleX(1); } }
         .bit-idx { color: #ef4444; font-weight: bold; text-decoration: underline; background: #450a0a; padding: 0 2px; }
-        .bit-rem { color: #10b981; }
-        /* วงรอบเลข 0 ที่กำลังนับ */
         .zero-focus { border: 1px solid #fbbf24; border-radius: 50%; padding: 0 1px; background: rgba(251, 191, 36, 0.2); }
         .one-focus { background: #10b981; color: black; border-radius: 2px; padding: 0 2px; font-weight: bold; }
     </style>
@@ -30,69 +28,89 @@
 <body class="bg-slate-100 p-4 font-sans text-slate-900">
     <div class="max-w-6xl mx-auto space-y-4">
         <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200">
-            <h1 class="text-3xl font-black text-center mb-6 text-blue-800 tracking-tight text-shadow">🏗️ HLL EDUCATIONAL SIMULATOR</h1>
+            <h1 class="text-3xl font-black text-center mb-6 text-blue-800 tracking-tight">🏗️ HLL EDUCATIONAL SIMULATOR</h1>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-4 space-y-4 bg-slate-50 p-5 rounded-xl border-2 border-slate-200 shadow-inner">
-                    <h3 class="font-bold text-slate-700 border-b pb-2 uppercase text-sm">⚙️ ตัวเลือกการสอน</h3>
-                    <div>
-                        <label class="text-xs font-bold text-slate-500">จำนวนถัง (m = 2^k)</label>
-                        <div class="grid grid-cols-3 gap-2 mt-2">
-                            <button onclick="setK(2)" class="k-btn p-2 rounded-lg bg-blue-600 text-white font-bold shadow" id="btn-k2">4</button>
-                            <button onclick="setK(4)" class="k-btn p-2 rounded-lg bg-white border-2 font-bold shadow-sm" id="btn-k4">16</button>
-                            <button onclick="setK(14)" class="k-btn p-2 rounded-lg bg-white border-2 font-bold shadow-sm text-xs" id="btn-k14">16,384</button>
+                <!-- Control Panel -->
+                <div class="lg:col-span-4 space-y-4">
+                    <div class="bg-slate-50 p-5 rounded-xl border-2 border-slate-200 shadow-inner space-y-4">
+                        <h3 class="font-bold text-slate-700 border-b pb-2 uppercase text-sm">⚙️ ตัวเลือกการสอน</h3>
+                        
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 italic">1. เลือกจำนวนถัง (m)</label>
+                            <div class="grid grid-cols-3 gap-2 mt-2">
+                                <button onclick="setK(2)" class="k-btn p-2 rounded-lg bg-blue-600 text-white font-bold shadow" id="btn-k2">4</button>
+                                <button onclick="setK(4)" class="k-btn p-2 rounded-lg bg-white border-2 font-bold shadow-sm" id="btn-k4">16</button>
+                                <button onclick="setK(14)" class="k-btn p-2 rounded-lg bg-white border-2 font-bold shadow-sm text-xs" id="btn-k14">16,384</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="pt-4 border-t">
-                        <label class="text-xs font-bold text-slate-500">จำลองข้อมูลจำนวนมาก (Batch)</label>
-                        <div class="flex gap-2 mt-2">
-                            <input type="number" id="batchSize" value="100" class="w-full p-2 border-2 rounded-lg text-center font-bold">
-                            <button onclick="addBatch()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700 shadow-md">Add X</button>
+
+                        <div class="pt-2">
+                            <label class="text-xs font-bold text-slate-500 italic">2. สุ่มข้อมูล</label>
+                            <div class="flex gap-2 mt-2">
+                                <input type="number" id="batchSize" value="100" class="w-1/3 p-2 border-2 rounded-lg text-center font-bold">
+                                <button onclick="addBatch()" class="w-2/3 bg-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-indigo-700">สุ่มเพิ่ม X ค่า</button>
+                            </div>
+                            <button onclick="addData()" id="singleAddBtn" class="w-full mt-2 bg-blue-600 text-white py-3 rounded-xl font-black shadow-lg hover:bg-blue-700 transform active:scale-95 transition">🎲 สุ่มข้อมูล 1 ค่า</button>
                         </div>
+
+                        <!-- ฟีเจอร์ใหม่: Manual Injection -->
+                        <div class="pt-4 border-t-2 border-slate-200 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                            <label class="text-xs font-bold text-amber-700 uppercase italic block mb-2">🚀 กำหนดค่าเอง (Manual Inject)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <span class="text-[10px] text-amber-600 font-bold uppercase">ไปที่ Bucket #</span>
+                                    <input type="number" id="manualBucket" value="0" min="0" class="w-full p-2 border-2 border-amber-300 rounded text-center font-bold text-amber-800">
+                                </div>
+                                <div>
+                                    <span class="text-[10px] text-amber-600 font-bold uppercase">ค่า Leading + 1</span>
+                                    <input type="number" id="manualPos" value="5" min="1" max="32" class="w-full p-2 border-2 border-amber-300 rounded text-center font-bold text-amber-800">
+                                </div>
+                            </div>
+                            <button onclick="injectData()" id="injectBtn" class="w-full mt-3 bg-amber-500 text-white py-2 rounded-lg font-black shadow-md hover:bg-amber-600 transition">ส่งข้อมูลไปที่ถังที่กำหนด</button>
+                        </div>
+                        
+                        <button onclick="resetHLL()" class="w-full text-slate-400 text-xs font-bold uppercase tracking-widest mt-2 hover:text-red-500">Reset System</button>
                     </div>
-                    <button onclick="addData()" id="singleAddBtn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg shadow-xl hover:bg-blue-700 transform active:scale-95 transition">🎲 สุ่มข้อมูล (SLOW MOTION)</button>
-                    <button onclick="resetHLL()" class="w-full text-slate-400 text-xs font-bold uppercase tracking-widest mt-2 hover:text-red-500">Reset System</button>
                 </div>
 
+                <!-- Logic Arena -->
                 <div class="lg:col-span-5 space-y-4">
                     <div class="bg-slate-900 rounded-2xl p-6 text-white font-mono shadow-2xl relative border-4 border-slate-800">
-                        <h3 class="text-blue-400 mb-4 border-b border-slate-700 pb-2 text-xs font-bold uppercase tracking-widest">🔍 Processing Stage</h3>
+                        <h3 class="text-blue-400 mb-4 border-b border-slate-700 pb-2 text-xs font-bold uppercase">🔍 Processing Stage</h3>
                         <div id="stepArea" class="space-y-6 min-h-[160px]">
-                            <div class="text-slate-500 italic text-center py-10">กดปุ่มสีน้ำเงินเพื่อเริ่มบทเรียน...</div>
+                            <div class="text-slate-500 italic text-center py-10">รอกดเพิ่มข้อมูล...</div>
                         </div>
                     </div>
                     
-                    <div class="bg-slate-800 rounded-xl p-4 text-xs font-mono text-blue-200 border border-slate-600 shadow-lg">
-                        <h4 class="text-slate-400 mb-2 font-bold uppercase">📐 สูตรคำนวณที่ใช้ (Harmonic Mean)</h4>
-                        <div class="bg-black/30 p-2 rounded text-center mb-2">
-                            $E = \alpha_m \cdot m^2 \cdot (\sum_{j=1}^m 2^{-M_j})^{-1}$
-                        </div>
-                        <p class="text-[10px] text-slate-400">โดยที่ $M_j$ คือค่าสูงสุดที่แต่ละถังเก็บไว้</p>
+                    <div class="bg-slate-800 rounded-xl p-4 text-xs font-mono text-blue-200 border border-slate-600 shadow-lg text-center">
+                        $E = \alpha_m \cdot m^2 \cdot (\sum_{j=1}^m 2^{-M_j})^{-1}$
                     </div>
                 </div>
 
-                <div class="lg:col-span-3 space-y-4">
+                <!-- Metrics -->
+                <div class="lg:col-span-3 space-y-4 text-center">
                     <div class="bg-white p-5 rounded-2xl border-4 border-slate-800 shadow-lg">
-                        <p class="text-xs font-black text-slate-400 uppercase">Actual Unique</p>
+                        <p class="text-xs font-black text-slate-400">ACTUAL UNIQUE</p>
                         <p id="actualTxt" class="text-5xl font-black italic">0</p>
                     </div>
                     <div class="bg-green-600 p-5 rounded-2xl border-4 border-green-800 shadow-lg text-white">
-                        <p class="text-xs font-black opacity-70 uppercase">HLL Estimate</p>
+                        <p class="text-xs font-black opacity-70">HLL ESTIMATE</p>
                         <p id="estimateTxt" class="text-5xl font-black italic">0</p>
                     </div>
-                    <div class="bg-white p-3 rounded-xl border-2 border-slate-200 text-center text-xs font-bold">
-                        Error Rate: <span id="errorTxt" class="text-red-600 text-sm">0</span>%
+                    <div class="bg-white p-3 rounded-xl border-2 border-slate-200 text-xs font-bold">
+                        Error: <span id="errorTxt" class="text-red-600 text-sm">0</span>%
                     </div>
                 </div>
             </div>
 
+            <!-- Buckets Visual -->
             <div id="visualSection" class="mt-10 pt-6">
                 <div id="bucketGrid" class="flex items-end justify-center h-56 gap-1 px-4 border-b-4 border-slate-800 bg-slate-50 rounded-t-xl overflow-hidden"></div>
-                <div id="bucketValueGrid" class="flex justify-around items-start pt-2 px-4 font-mono text-[10px] font-bold text-slate-500">
-                    </div>
+                <div id="bucketValueGrid" class="flex justify-around items-start pt-2 px-4 font-mono text-[10px] font-bold text-slate-500"></div>
             </div>
-            <div id="tooManyBuckets" class="hidden mt-10 p-20 text-center bg-slate-900 rounded-2xl text-blue-400 italic font-mono border-4 border-slate-800">
-                &lt; 16,384 BUCKETS ACTIVE: GRAPH HIDDEN FOR PERFORMANCE &gt;
+            <div id="tooManyBuckets" class="hidden mt-10 p-20 text-center bg-slate-900 rounded-2xl text-blue-400 italic font-mono border-4 border-slate-800 tracking-widest uppercase text-sm">
+                Buckets hidden for performance (m = 16,384)
             </div>
         </div>
     </div>
@@ -115,6 +133,9 @@
             document.getElementById('btn-k'+k).classList.add('bg-blue-600', 'text-white');
             document.getElementById('btn-k'+k).classList.remove('bg-white');
             
+            // จำกัดเลข Bucket ในช่อง Inject
+            document.getElementById('manualBucket').max = m - 1;
+
             if (m > 64) {
                 document.getElementById('visualSection').classList.add('hidden');
                 document.getElementById('tooManyBuckets').classList.remove('hidden');
@@ -130,22 +151,45 @@
             const valGrid = document.getElementById('bucketValueGrid');
             grid.innerHTML = '';
             valGrid.innerHTML = '';
-            
             if (m <= 64) {
                 for (let i = 0; i < m; i++) {
-                    grid.innerHTML += `
-                        <div class="flex-1 flex flex-col items-center h-full justify-end group relative">
-                            <div id="bar-${i}" class="bucket-bar w-full bg-blue-500 rounded-t-md shadow-inner border-x border-blue-600" style="height:0px"></div>
-                            <div class="h-1 w-full bg-slate-300"></div>
-                        </div>`;
-                    valGrid.innerHTML += `
-                        <div class="flex-1 text-center">
-                            <div class="text-blue-600 font-black text-xs" id="val-text-${i}">0</div>
-                            <div class="text-slate-400 text-[8px]">B${i}</div>
-                        </div>`;
+                    grid.innerHTML += `<div class="flex-1 flex flex-col items-center h-full justify-end group relative"><div id="bar-${i}" class="bucket-bar w-full bg-blue-500 rounded-t-md shadow-inner border-x border-blue-600" style="height:0px"></div><div class="h-1 w-full bg-slate-300"></div></div>`;
+                    valGrid.innerHTML += `<div class="flex-1 text-center"><div class="text-blue-600 font-black text-xs" id="val-text-${i}">0</div><div class="text-slate-400 text-[8px]">B${i}</div></div>`;
                 }
             }
             updateStats();
+        }
+
+        // ฟังก์ชันใหม่: Inject ข้อมูลที่กำหนดเอง
+        async function injectData() {
+            if (isRunning) return;
+            const targetB = parseInt(document.getElementById('manualBucket').value);
+            const targetP = parseInt(document.getElementById('manualPos').value);
+
+            if (targetB < 0 || targetB >= m) {
+                alert(`กรุณาเลือก Bucket ระหว่าง 0 ถึง ${m-1}`);
+                return;
+            }
+            if (targetP < 1 || targetP > 32) {
+                alert("Leading 0s + 1 ต้องอยู่ระหว่าง 1 ถึง 32");
+                return;
+            }
+
+            isRunning = true;
+            actualData.add(Math.random()); // จำลองว่าเป็น unique ใหม่
+
+            // สร้างภาพ Binary จำลอง (แสดงผลเพื่อให้เห็นภาพตามค่าที่กรอก)
+            const idxBin = targetB.toString(2).padStart(k, '0');
+            const remBin = '0'.repeat(targetP - 1) + '1' + '0'.repeat(32 - k - targetP);
+            
+            displayStep(idxBin, remBin, targetB, targetP, "MANUAL INJECTION");
+            
+            if (m <= 64) createParticle(targetB, 'injectBtn');
+
+            setTimeout(() => {
+                applyUpdate(targetB, targetP);
+                isRunning = false;
+            }, 1300);
         }
 
         async function addData() {
@@ -157,62 +201,59 @@
             const idxStr = bin.substring(0, k);
             const bucketIdx = parseInt(idxStr, 2);
             const remStr = bin.substring(k);
-            
-            // หาเลข 1 ตัวแรก และสร้าง Highlight สำหรับเลข 0
             const firstOneIdx = remStr.indexOf('1');
             const pos = (firstOneIdx === -1) ? remStr.length + 1 : firstOneIdx + 1;
-            
-            let highlightedRem = "";
-            for(let i=0; i<remStr.length; i++) {
-                if (i < firstOneIdx) highlightedRem += `<span class="zero-focus">${remStr[i]}</span>`;
-                else if (i === firstOneIdx) highlightedRem += `<span class="one-focus">${remStr[i]}</span>`;
-                else highlightedRem += remStr[i];
-            }
 
-            const stepArea = document.getElementById('stepArea');
-            stepArea.innerHTML = `
-                <div class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Step 1: Hashing & Splitting</div>
-                <div class="text-lg bg-slate-800 p-2 rounded border border-slate-700 break-all leading-tight font-mono">
-                    <span class="bit-idx" title="Bucket Index">${idxStr}</span><span class="bit-rem">${highlightedRem}</span>
-                </div>
-                <div class="grid grid-cols-2 gap-4 bg-blue-900/20 p-3 rounded-xl border border-blue-500/30">
-                    <div>
-                        <span class="text-[10px] block text-blue-300 uppercase font-bold">Bucket ID</span>
-                        <span class="text-2xl font-black"># ${bucketIdx}</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[10px] block text-green-300 uppercase font-bold">Leading 0s + 1</span>
-                        <span class="text-2xl font-black text-green-400">${pos}</span>
-                    </div>
-                </div>
-            `;
-
-            if (m <= 64) createParticle(bucketIdx);
+            displayStep(idxStr, remStr, bucketIdx, pos, "RANDOM HASHING");
+            if (m <= 64) createParticle(bucketIdx, 'singleAddBtn');
 
             setTimeout(() => {
-                const old = buckets[bucketIdx];
-                buckets[bucketIdx] = Math.max(buckets[bucketIdx], pos);
-                if (m <= 64) {
-                    const bar = document.getElementById(`bar-${bucketIdx}`);
-                    const txt = document.getElementById(`val-text-${bucketIdx}`);
-                    bar.style.height = (buckets[bucketIdx] * 6) + 'px';
-                    txt.innerText = buckets[bucketIdx];
-                    if (buckets[bucketIdx] > old) {
-                        bar.classList.add('update-flash');
-                        txt.classList.add('text-amber-500', 'scale-125');
-                        setTimeout(() => {
-                            bar.classList.remove('update-flash');
-                            txt.classList.remove('text-amber-500', 'scale-125');
-                        }, 800);
-                    }
-                }
-                updateStats();
+                applyUpdate(bucketIdx, pos);
                 isRunning = false;
             }, 1300);
         }
 
-        function createParticle(targetIdx) {
-            const btn = document.getElementById('singleAddBtn').getBoundingClientRect();
+        function displayStep(idx, rem, bIdx, p, mode) {
+            const firstOneIdx = rem.indexOf('1');
+            let highlightedRem = "";
+            for(let i=0; i<rem.length; i++) {
+                if (i < firstOneIdx) highlightedRem += `<span class="zero-focus">${rem[i]}</span>`;
+                else if (i === firstOneIdx) highlightedRem += `<span class="one-focus">${rem[i]}</span>`;
+                else highlightedRem += rem[i];
+            }
+            document.getElementById('stepArea').innerHTML = `
+                <div class="text-[10px] uppercase text-amber-500 font-bold tracking-widest">${mode}</div>
+                <div class="text-lg bg-slate-800 p-2 rounded border border-slate-700 break-all leading-tight font-mono text-white">
+                    <span class="bit-idx">${idx}</span><span class="bit-rem">${highlightedRem}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4 bg-blue-900/20 p-3 rounded-xl border border-blue-500/30">
+                    <div><span class="text-[10px] block text-blue-300 font-bold uppercase italic">Into Bucket</span><span class="text-2xl font-black"># ${bIdx}</span></div>
+                    <div class="text-right"><span class="text-[10px] block text-green-300 font-bold uppercase italic">Leading 0s + 1</span><span class="text-2xl font-black text-green-400">${p}</span></div>
+                </div>`;
+        }
+
+        function applyUpdate(bIdx, p) {
+            const old = buckets[bIdx];
+            buckets[bIdx] = Math.max(buckets[bIdx], p);
+            if (m <= 64) {
+                const bar = document.getElementById(`bar-${bIdx}`);
+                const txt = document.getElementById(`val-text-${bIdx}`);
+                bar.style.height = (buckets[bIdx] * 6) + 'px';
+                txt.innerText = buckets[bIdx];
+                if (buckets[bIdx] > old) {
+                    bar.classList.add('update-flash');
+                    txt.classList.add('text-amber-500', 'scale-125');
+                    setTimeout(() => {
+                        bar.classList.remove('update-flash');
+                        txt.classList.remove('text-amber-500', 'scale-125');
+                    }, 800);
+                }
+            }
+            updateStats();
+        }
+
+        function createParticle(targetIdx, sourceBtnId) {
+            const btn = document.getElementById(sourceBtnId).getBoundingClientRect();
             const bar = document.getElementById(`bar-${targetIdx}`).getBoundingClientRect();
             const p = document.createElement('div');
             p.className = 'particle';
@@ -245,7 +286,7 @@
                     document.getElementById(`val-text-${i}`).innerText = v;
                 });
             }
-            document.getElementById('stepArea').innerHTML = `<div class="py-10 text-center text-green-500 font-black text-xl italic uppercase tracking-tighter shadow-sm">🚀 Batch Processed: ${size.toLocaleString()} Items</div>`;
+            document.getElementById('stepArea').innerHTML = `<div class="py-10 text-center text-green-500 font-black text-xl italic uppercase tracking-tighter">🚀 Batch Added: ${size.toLocaleString()} Items</div>`;
             updateStats();
         }
 
@@ -253,25 +294,19 @@
             let alpha = 0.7213 / (1 + 1.079 / m);
             if (m === 16) alpha = 0.673;
             if (m >= 128) alpha = 0.7213;
-
             let sumRec = 0;
             buckets.forEach(b => sumRec += Math.pow(2, -b));
             let est = alpha * (m * m) * (1 / sumRec);
-            
             if (est <= 2.5 * m) {
                 let v = buckets.filter(x => x === 0).length;
                 if (v > 0) est = m * Math.log(m / v);
             }
-
             let finalEst = Math.round(est);
             document.getElementById('actualTxt').innerText = actualData.size.toLocaleString();
             document.getElementById('estimateTxt').innerText = finalEst.toLocaleString();
-            
             if (actualData.size > 0) {
                 let err = (Math.abs(finalEst - actualData.size) / actualData.size) * 100;
                 document.getElementById('errorTxt').innerText = err.toFixed(2);
-            } else {
-                document.getElementById('errorTxt').innerText = "0";
             }
         }
 
